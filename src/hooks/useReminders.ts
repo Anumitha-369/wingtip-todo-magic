@@ -70,11 +70,11 @@ export const useReminders = (tasks: Task[], onUpdateTask: (id: string, updates: 
     };
 
 
-    const interval = setInterval(checkReminders, 30000); // Check every 30 seconds
+    const interval = setInterval(checkReminders, 10000); // Check every 10 seconds for more accurate notifications
     checkReminders(); // Check immediately
 
     return () => clearInterval(interval);
-  }, [tasks]);
+  }, [tasks, onUpdateTask]);
 
   // Request notification permission on mount with user-friendly prompt
   useEffect(() => {
