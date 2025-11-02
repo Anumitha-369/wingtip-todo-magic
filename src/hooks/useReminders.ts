@@ -16,70 +16,85 @@ export const useReminders = (tasks: Task[]) => {
           if (now >= reminderDate) {
             checkedReminders.current.add(task.id);
             
-            // Show toast with custom snooze options
+            // Show toast with custom snooze options (only when app is in focus)
             const toastId = toast.info(`⏰ Reminder: ${task.title}`, {
               description: task.description || 'Time to work on this task!',
-              duration: 10000,
+              duration: 15000,
               action: {
                 label: 'Snooze',
                 onClick: () => {
                   toast.dismiss(toastId);
-                  // Show snooze duration options
-                  const snoozeToast = toast('Choose snooze duration', {
-                    description: 'Select how long to snooze this reminder',
-                    duration: Infinity,
-                    action: {
-                      label: '5 min',
-                      onClick: () => {
-                        checkedReminders.current.delete(task.id);
-                        toast.dismiss(snoozeToast);
-                        toast.success('Reminder snoozed for 5 minutes');
-                      },
-                    },
-                    cancel: {
-                      label: 'More options',
-                      onClick: () => {
-                        toast.dismiss(snoozeToast);
-                        showMoreSnoozeOptions();
-                      },
-                    },
-                  });
-
-                  const showMoreSnoozeOptions = () => {
-                    const options = [
-                      { label: '10 minutes', value: 10 },
-                      { label: '15 minutes', value: 15 },
-                      { label: '30 minutes', value: 30 },
-                      { label: '1 hour', value: 60 },
-                      { label: '2 hours', value: 120 },
-                    ];
-
-                    options.forEach((option) => {
-                      toast(option.label, {
-                        duration: 5000,
-                        action: {
-                          label: 'Snooze',
-                          onClick: () => {
-                            checkedReminders.current.delete(task.id);
-                            toast.success(`Reminder snoozed for ${option.label}`);
-                          },
-                        },
-                      });
-                    });
-                  };
+                  showSnoozeOptions(task.id);
                 },
               },
             });
 
-            // Request notification permission
+            // Browser notification (works even when app is in background/other apps)
             if ('Notification' in window && Notification.permission === 'granted') {
-              new Notification(`Task Reminder: ${task.title}`, {
+              const notification = new Notification(`⏰ Task Reminder: ${task.title}`, {
                 body: task.description || 'Time to work on this task!',
                 icon: '/favicon.ico',
+                badge: '/favicon.ico',
+                tag: task.id,
+                requireInteraction: true, // Keep notification visible until user interacts
+                silent: false,
               });
+
+              // Handle notification click - bring user back to app
+              notification.onclick = () => {
+                window.focus();
+                notification.close();
+                // Show snooze options when user clicks notification
+                showSnoozeOptions(task.id);
+              };
             }
           }
         }
+      });
+    };
+
+    const showSnoozeOptions = (taskId: string) => {
+      const snoozeToast = toast('Choose snooze duration', {
+        description: 'How long should we remind you again?',
+        duration: Infinity,
+        action: {
+          label: '5 min',
+          onClick: () => {
+            checkedReminders.current.delete(taskId);
+            toast.dismiss(snoozeToast);
+            toast.success('⏰ Reminder snoozed for 5 minutes');
+          },
+        },
+        cancel: {
+          label: 'More options',
+          onClick: () => {
+            toast.dismiss(snoozeToast);
+            showMoreSnoozeOptions(taskId);
+          },
+        },
+      });
+    };
+
+    const showMoreSnoozeOptions = (taskId: string) => {
+      const options = [
+        { label: '10 minutes', value: 10 },
+        { label: '15 minutes', value: 15 },
+        { label: '30 minutes', value: 30 },
+        { label: '1 hour', value: 60 },
+        { label: '2 hours', value: 120 },
+      ];
+
+      options.forEach((option) => {
+        toast(option.label, {
+          duration: 8000,
+          action: {
+            label: 'Snooze',
+            onClick: () => {
+              checkedReminders.current.delete(taskId);
+              toast.success(`⏰ Reminder snoozed for ${option.label}`);
+            },
+          },
+        });
       });
     };
 
@@ -89,10 +104,23 @@ export const useReminders = (tasks: Task[]) => {
     return () => clearInterval(interval);
   }, [tasks]);
 
-  // Request notification permission on mount
+  // Request notification permission on mount with user-friendly prompt
   useEffect(() => {
     if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
+      // Show a toast to ask for permission
+      toast.info('Enable notifications to get reminders even when using other apps', {
+        duration: 10000,
+        action: {
+          label: 'Enable',
+          onClick: () => {
+            Notification.requestPermission().then(permission => {
+              if (permission === 'granted') {
+                toast.success('Notifications enabled! You\'ll receive reminders even in other apps.');
+              }
+            });
+          },
+        },
+      });
     }
   }, []);
 };
