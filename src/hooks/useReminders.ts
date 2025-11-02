@@ -16,17 +16,59 @@ export const useReminders = (tasks: Task[]) => {
           if (now >= reminderDate) {
             checkedReminders.current.add(task.id);
             
-            toast.info(`⏰ Reminder: ${task.title}`, {
+            // Show toast with custom snooze options
+            const toastId = toast.info(`⏰ Reminder: ${task.title}`, {
               description: task.description || 'Time to work on this task!',
+              duration: 10000,
               action: {
-                label: 'Snooze 10min',
+                label: 'Snooze',
                 onClick: () => {
-                  const snoozeTime = new Date(now.getTime() + 10 * 60 * 1000);
-                  checkedReminders.current.delete(task.id);
-                  toast.success('Reminder snoozed for 10 minutes');
+                  toast.dismiss(toastId);
+                  // Show snooze duration options
+                  const snoozeToast = toast('Choose snooze duration', {
+                    description: 'Select how long to snooze this reminder',
+                    duration: Infinity,
+                    action: {
+                      label: '5 min',
+                      onClick: () => {
+                        checkedReminders.current.delete(task.id);
+                        toast.dismiss(snoozeToast);
+                        toast.success('Reminder snoozed for 5 minutes');
+                      },
+                    },
+                    cancel: {
+                      label: 'More options',
+                      onClick: () => {
+                        toast.dismiss(snoozeToast);
+                        showMoreSnoozeOptions();
+                      },
+                    },
+                  });
+
+                  const showMoreSnoozeOptions = () => {
+                    const options = [
+                      { label: '10 minutes', value: 10 },
+                      { label: '15 minutes', value: 15 },
+                      { label: '30 minutes', value: 30 },
+                      { label: '1 hour', value: 60 },
+                      { label: '2 hours', value: 120 },
+                    ];
+
+                    options.forEach((option) => {
+                      toast(option.label, {
+                        duration: 5000,
+                        action: {
+                          label: 'Snooze',
+                          onClick: () => {
+                            checkedReminders.current.delete(task.id);
+                            toast.success(`Reminder snoozed for ${option.label}`);
+                          },
+                        },
+                      });
+                    });
+                  };
                 },
               },
-              duration: 10000,
             });
 
             // Request notification permission

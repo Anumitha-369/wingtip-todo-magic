@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,9 +8,12 @@ import { Task } from '@/types/task';
 
 interface AddTaskFormProps {
   onAdd: (task: Omit<Task, 'id' | 'completed' | 'createdAt'>) => void;
+  editTask?: Task | null;
+  onUpdate?: (id: string, task: Omit<Task, 'id' | 'completed' | 'createdAt'>) => void;
+  onCancelEdit?: () => void;
 }
 
-const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
+const AddTaskForm = ({ onAdd, editTask, onUpdate, onCancelEdit }: AddTaskFormProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -18,17 +21,38 @@ const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
   const [dueDate, setDueDate] = useState('');
   const [reminderTime, setReminderTime] = useState('');
 
+  useEffect(() => {
+    if (editTask) {
+      setIsOpen(true);
+      setTitle(editTask.title);
+      setDescription(editTask.description || '');
+      setPriority(editTask.priority);
+      setDueDate(editTask.dueDate || '');
+      setReminderTime(editTask.reminderTime || '');
+    }
+  }, [editTask]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
 
-    onAdd({
-      title: title.trim(),
-      description: description.trim(),
-      priority,
-      dueDate: dueDate || undefined,
-      reminderTime: reminderTime || undefined,
-    });
+    if (editTask && onUpdate) {
+      onUpdate(editTask.id, {
+        title: title.trim(),
+        description: description.trim(),
+        priority,
+        dueDate: dueDate || undefined,
+        reminderTime: reminderTime || undefined,
+      });
+    } else {
+      onAdd({
+        title: title.trim(),
+        description: description.trim(),
+        priority,
+        dueDate: dueDate || undefined,
+        reminderTime: reminderTime || undefined,
+      });
+    }
 
     setTitle('');
     setDescription('');
@@ -38,7 +62,17 @@ const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
     setIsOpen(false);
   };
 
-  if (!isOpen) {
+  const handleCancel = () => {
+    setTitle('');
+    setDescription('');
+    setPriority('medium');
+    setDueDate('');
+    setReminderTime('');
+    setIsOpen(false);
+    if (onCancelEdit) onCancelEdit();
+  };
+
+  if (!isOpen && !editTask) {
     return (
       <Button
         onClick={() => setIsOpen(true)}
@@ -53,7 +87,14 @@ const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
 
   return (
     <form onSubmit={handleSubmit} className="bg-card/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-border animate-slide-up">
-      <h3 className="text-lg font-semibold mb-4 text-card-foreground">Create New Task</h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold text-card-foreground">
+          {editTask ? 'Edit Task' : 'Create New Task'}
+        </h3>
+        <Button type="button" variant="ghost" size="icon" onClick={handleCancel}>
+          <X className="w-5 h-5" />
+        </Button>
+      </div>
       
       <div className="space-y-4">
         <Input
@@ -106,9 +147,9 @@ const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
         
         <div className="flex gap-2">
           <Button type="submit" className="flex-1 bg-primary hover:bg-primary/90">
-            Add Task
+            {editTask ? 'Update Task' : 'Add Task'}
           </Button>
-          <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+          <Button type="button" variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
         </div>

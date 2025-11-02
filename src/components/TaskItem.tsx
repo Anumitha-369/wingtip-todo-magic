@@ -1,4 +1,4 @@
-import { Trash2, Flag } from 'lucide-react';
+import { Trash2, Flag, Pencil } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Task } from '@/types/task';
@@ -7,6 +7,7 @@ interface TaskItemProps {
   task: Task;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
+  onEdit: (id: string) => void;
 }
 
 const priorityColors = {
@@ -15,7 +16,7 @@ const priorityColors = {
   high: 'border-l-accent',
 };
 
-const TaskItem = ({ task, onToggle, onDelete }: TaskItemProps) => {
+const TaskItem = ({ task, onToggle, onDelete, onEdit }: TaskItemProps) => {
   return (
     <div
       className={`group bg-card/80 backdrop-blur-sm border-l-4 ${
@@ -57,14 +58,22 @@ const TaskItem = ({ task, onToggle, onDelete }: TaskItemProps) => {
           </div>
         </div>
         
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onDelete(task.id)}
-          className="opacity-0 group-hover:opacity-100 transition-opacity"
-        >
-          <Trash2 className="w-4 h-4" />
-        </Button>
+        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onEdit(task.id)}
+          >
+            <Pencil className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onDelete(task.id)}
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -16,6 +16,7 @@ const Index = () => {
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
   const [showCelebration, setShowCelebration] = useState(false);
   const [streak, setStreak] = useState(0);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   useReminders(tasks);
 
@@ -63,6 +64,21 @@ const Index = () => {
   const deleteTask = (id: string) => {
     setTasks(tasks.filter(task => task.id !== id));
     toast.info('Task deleted');
+  };
+
+  const editTask = (id: string) => {
+    const task = tasks.find(t => t.id === id);
+    if (task) setEditingTask(task);
+  };
+
+  const updateTask = (id: string, taskData: Omit<Task, 'id' | 'completed' | 'createdAt'>) => {
+    setTasks(tasks.map(task => 
+      task.id === id 
+        ? { ...task, ...taskData }
+        : task
+    ));
+    setEditingTask(null);
+    toast.success('Task updated successfully! ✏️');
   };
 
   const filteredTasks = tasks.filter(task => {
@@ -121,7 +137,12 @@ const Index = () => {
 
         {/* Add Task Form */}
         <div className="mb-6">
-          <AddTaskForm onAdd={addTask} />
+          <AddTaskForm 
+            onAdd={addTask} 
+            editTask={editingTask}
+            onUpdate={updateTask}
+            onCancelEdit={() => setEditingTask(null)}
+          />
         </div>
 
         {/* Task List */}
@@ -141,6 +162,7 @@ const Index = () => {
                 task={task}
                 onToggle={toggleTask}
                 onDelete={deleteTask}
+                onEdit={editTask}
               />
             ))
           )}
