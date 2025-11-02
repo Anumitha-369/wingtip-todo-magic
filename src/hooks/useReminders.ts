@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Task } from '@/types/task';
 import { toast } from 'sonner';
 
-export const useReminders = (tasks: Task[]) => {
+export const useReminders = (tasks: Task[], onUpdateTask: (id: string, updates: Partial<Task>) => void) => {
   const checkedReminders = useRef<Set<string>>(new Set());
 
   useEffect(() => {
@@ -53,6 +53,16 @@ export const useReminders = (tasks: Task[]) => {
       });
     };
 
+    const snoozeReminder = (taskId: string, minutes: number, label: string) => {
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return;
+
+      const newReminderTime = new Date(Date.now() + minutes * 60 * 1000);
+      checkedReminders.current.delete(taskId);
+      onUpdateTask(taskId, { reminderTime: newReminderTime.toISOString() });
+      toast.success(`⏰ Reminder snoozed for ${label}`);
+    };
+
     const showSnoozeOptions = (taskId: string) => {
       const snoozeToast = toast('Choose snooze duration', {
         description: 'How long should we remind you again?',
@@ -60,9 +70,8 @@ export const useReminders = (tasks: Task[]) => {
         action: {
           label: '5 min',
           onClick: () => {
-            checkedReminders.current.delete(taskId);
             toast.dismiss(snoozeToast);
-            toast.success('⏰ Reminder snoozed for 5 minutes');
+            snoozeReminder(taskId, 5, '5 minutes');
           },
         },
         cancel: {
@@ -90,8 +99,7 @@ export const useReminders = (tasks: Task[]) => {
           action: {
             label: 'Snooze',
             onClick: () => {
-              checkedReminders.current.delete(taskId);
-              toast.success(`⏰ Reminder snoozed for ${option.label}`);
+              snoozeReminder(taskId, option.value, option.label);
             },
           },
         });

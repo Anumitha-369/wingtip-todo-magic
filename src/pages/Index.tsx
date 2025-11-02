@@ -18,7 +18,13 @@ const Index = () => {
   const [streak, setStreak] = useState(0);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-  useReminders(tasks);
+  const updateTaskReminder = (id: string, updates: Partial<Task>) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...task, ...updates } : task
+    ));
+  };
+
+  useReminders(tasks, updateTaskReminder);
 
   // Load tasks from localStorage on mount
   useEffect(() => {
