@@ -10,6 +10,7 @@ import { Task } from '@/types/task';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useReminders } from '@/hooks/useReminders';
+import { SnoozeDialog } from '@/components/SnoozeDialog';
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -24,7 +25,7 @@ const Index = () => {
     ));
   };
 
-  useReminders(tasks, updateTaskReminder);
+  const { snoozeDialogState, setSnoozeDialogState, snoozeReminder } = useReminders(tasks, updateTaskReminder);
 
   // Load tasks from localStorage on mount
   useEffect(() => {
@@ -174,6 +175,18 @@ const Index = () => {
           )}
         </div>
       </div>
+
+      {/* Snooze Dialog */}
+      <SnoozeDialog
+        open={!!snoozeDialogState}
+        onOpenChange={(open) => !open && setSnoozeDialogState(null)}
+        onSnooze={(minutes, label) => {
+          if (snoozeDialogState) {
+            snoozeReminder(snoozeDialogState.taskId, minutes, label);
+          }
+        }}
+        taskTitle={snoozeDialogState?.taskTitle || ''}
+      />
     </div>
   );
 };

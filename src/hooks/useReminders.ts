@@ -1,9 +1,15 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Task } from '@/types/task';
 import { toast } from 'sonner';
 
+interface SnoozeState {
+  taskId: string;
+  taskTitle: string;
+}
+
 export const useReminders = (tasks: Task[], onUpdateTask: (id: string, updates: Partial<Task>) => void) => {
   const checkedReminders = useRef<Set<string>>(new Set());
+  const [snoozeDialogState, setSnoozeDialogState] = useState<SnoozeState | null>(null);
 
   useEffect(() => {
     const checkReminders = () => {
@@ -24,7 +30,7 @@ export const useReminders = (tasks: Task[], onUpdateTask: (id: string, updates: 
                 label: 'Snooze',
                 onClick: () => {
                   toast.dismiss(toastId);
-                  showSnoozeOptions(task.id);
+                  setSnoozeDialogState({ taskId: task.id, taskTitle: task.title });
                 },
               },
             });
@@ -44,8 +50,8 @@ export const useReminders = (tasks: Task[], onUpdateTask: (id: string, updates: 
               notification.onclick = () => {
                 window.focus();
                 notification.close();
-                // Show snooze options when user clicks notification
-                showSnoozeOptions(task.id);
+                // Show snooze dialog when user clicks notification
+                setSnoozeDialogState({ taskId: task.id, taskTitle: task.title });
               };
             }
           }
@@ -63,51 +69,6 @@ export const useReminders = (tasks: Task[], onUpdateTask: (id: string, updates: 
       toast.success(`⏰ Reminder snoozed for ${label}`);
     };
 
-    const showSnoozeOptions = (taskId: string) => {
-      const snoozeToast = toast('Choose snooze duration', {
-        description: 'How long should we remind you again?',
-        duration: Infinity,
-        action: {
-          label: '5 min',
-          onClick: () => {
-            toast.dismiss(snoozeToast);
-            snoozeReminder(taskId, 5, '5 minutes');
-          },
-        },
-        cancel: {
-          label: 'More options',
-          onClick: () => {
-            toast.dismiss(snoozeToast);
-            showMoreSnoozeOptions(taskId);
-          },
-        },
-      });
-    };
-
-    const showMoreSnoozeOptions = (taskId: string) => {
-      const options = [
-        { label: '2 minutes', value: 2 },
-        { label: '10 minutes', value: 10 },
-        { label: '20 minutes', value: 20 },
-        { label: '30 minutes', value: 30 },
-        { label: '1 hour', value: 60 },
-        { label: '2 hours', value: 120 },
-        { label: '3 hours', value: 180 },
-        { label: 'Tomorrow', value: 1440 }, // 24 hours
-      ];
-
-      options.forEach((option) => {
-        toast(option.label, {
-          duration: 8000,
-          action: {
-            label: 'Snooze',
-            onClick: () => {
-              snoozeReminder(taskId, option.value, option.label);
-            },
-          },
-        });
-      });
-    };
 
     const interval = setInterval(checkReminders, 30000); // Check every 30 seconds
     checkReminders(); // Check immediately
@@ -134,4 +95,18 @@ export const useReminders = (tasks: Task[], onUpdateTask: (id: string, updates: 
       });
     }
   }, []);
+
+  return {
+    snoozeDialogState,
+    setSnoozeDialogState,
+    snoozeReminder: (taskId: string, minutes: number, label: string) => {
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return;
+
+      const newReminderTime = new Date(Date.now() + minutes * 60 * 1000);
+      checkedReminders.current.delete(taskId);
+      onUpdateTask(taskId, { reminderTime: newReminderTime.toISOString() });
+      toast.success(`⏰ Reminder snoozed for ${label}`);
+    },
+  };
 };
