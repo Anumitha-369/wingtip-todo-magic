@@ -1,19 +1,23 @@
 import { useState, useEffect } from 'react';
-import { ListTodo, Filter } from 'lucide-react';
+import { ListTodo } from 'lucide-react';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import CelebrationBird from '@/components/CelebrationBird';
 import TaskItem from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
 import StatsPanel from '@/components/StatsPanel';
+import ThemeSelector from '@/components/ThemeSelector';
 import { Task } from '@/types/task';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useReminders } from '@/hooks/useReminders';
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
   const [showCelebration, setShowCelebration] = useState(false);
   const [streak, setStreak] = useState(0);
+
+  useReminders(tasks);
 
   // Load tasks from localStorage on mount
   useEffect(() => {
@@ -77,11 +81,14 @@ const Index = () => {
         <header className="text-center mb-8 animate-slide-up">
           <div className="flex items-center justify-center gap-3 mb-3">
             <ListTodo className="w-10 h-10 text-primary" />
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#ff6b9d] via-[#ffd93d] to-[#6bcf7f] bg-clip-text text-transparent drop-shadow-lg">
               TaskMaster
             </h1>
+            <div className="ml-4">
+              <ThemeSelector />
+            </div>
           </div>
-          <p className="text-foreground/80 text-lg">Your awesome productivity companion ✨</p>
+          <p className="text-foreground/80 text-lg font-medium">Your awesome productivity companion ✨</p>
         </header>
 
         {/* Stats Panel */}

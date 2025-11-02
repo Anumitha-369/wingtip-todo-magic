@@ -16,6 +16,7 @@ const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
   const [dueDate, setDueDate] = useState('');
+  const [reminderTime, setReminderTime] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,12 +27,14 @@ const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
       description: description.trim(),
       priority,
       dueDate: dueDate || undefined,
+      reminderTime: reminderTime || undefined,
     });
 
     setTitle('');
     setDescription('');
     setPriority('medium');
     setDueDate('');
+    setReminderTime('');
     setIsOpen(false);
   };
 
@@ -86,6 +89,18 @@ const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
             className="bg-background/50"
+            placeholder="Due Date"
+          />
+        </div>
+
+        <div>
+          <label className="text-sm text-muted-foreground mb-1 block">Set Reminder (Optional)</label>
+          <Input
+            type="datetime-local"
+            value={reminderTime}
+            onChange={(e) => setReminderTime(e.target.value)}
+            className="bg-background/50"
+            placeholder="Reminder Time"
           />
         </div>
         

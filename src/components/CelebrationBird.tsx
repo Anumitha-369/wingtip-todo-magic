@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import celebrationBirdImg from '@/assets/celebration-bird.png';
 
 interface CelebrationBirdProps {
   show: boolean;
@@ -23,9 +24,11 @@ const CelebrationBird = ({ show, onComplete }: CelebrationBirdProps) => {
 
   return (
     <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center">
-      <div className="animate-fly-in text-8xl">
-        🐦👍
-      </div>
+      <img 
+        src={celebrationBirdImg} 
+        alt="Celebration bird" 
+        className="animate-fly-in w-64 h-48 object-contain"
+      />
       
       {/* Confetti */}
       {[...Array(20)].map((_, i) => (

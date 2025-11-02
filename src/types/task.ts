@@ -5,5 +5,8 @@ export interface Task {
   completed: boolean;
   priority: 'low' | 'medium' | 'high';
   dueDate?: string;
+  reminderTime?: string;
   createdAt: string;
 }
+
+export type Theme = 'gradient' | 'natural' | 'multicolor' | 'calm' | 'floral' | 'cartoon';

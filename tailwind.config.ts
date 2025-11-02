@@ -96,6 +96,20 @@ export default {
           "50%": { opacity: "1" },
           "100%": { transform: "translateX(0) translateY(0) rotate(0deg)", opacity: "1" },
         },
+        "bubble-rise": {
+          "0%": {
+            transform: "translateY(0) translateX(0)",
+            opacity: "0.5",
+          },
+          "50%": {
+            transform: "translateY(-50vh) translateX(20px)",
+            opacity: "0.8",
+          },
+          "100%": {
+            transform: "translateY(-100vh) translateX(-20px)",
+            opacity: "0",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -106,6 +120,7 @@ export default {
         "confetti": "confetti 3s ease-out forwards",
         "bounce-in": "bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)",
         "fly-in": "fly-in 1s cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "bubble-rise": "bubble-rise 10s ease-in infinite",
       },
     },
   },
