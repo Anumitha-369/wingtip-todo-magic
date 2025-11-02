@@ -100,4 +100,4 @@ Go to your repository’s main page
 - Edit files and commit/push changes
 ---
 
-> Happy to collaborate! Open to ideas, feedback, and contributions. Let’s build something awesome together 🔗
+> Happy to collaborate! Open to ideas, feedback, and contributions. Let’s build something awesome together🔗
