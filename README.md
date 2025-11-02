@@ -1,6 +1,6 @@
-## Project info
+## Project info - TASK MASTER [ TO-DO-LIST WEB APPLICATION ]
 
-**URL**: https://lovable.dev/projects/523c3adc-1e7b-4e81-904e-1c1e51eed751
+**URL**: https://6907c1b7be9f34cfb32b16b3--effervescent-gecko-13cbe3.netlify.app/
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
@@ -43,15 +43,3 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/523c3adc-1e7b-4e81-904e-1c1e51eed751) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
