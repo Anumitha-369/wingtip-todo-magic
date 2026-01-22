@@ -20,6 +20,8 @@ This project is built with:
 
 💨 Tailwind CSS – Utility-first styling
 
+🐳 Docker – Containerization
+
 
 - Frontend	     - React + Vite + TypeScript + Tailwind
 
@@ -27,7 +29,7 @@ This project is built with:
 
 - Database	     - MongoDB
 
-- Deployment	     - Netlify (frontend), Render (backend)
+- Deployment	     - Netlify (frontend), Render (backend), Docker (recently added)
 
 ----
 
